@@ -1,7 +1,6 @@
 extends Node3D
 
 @onready var core = get_tree().get_first_node_in_group("core")
-@onready var ui = get_tree().get_first_node_in_group("ui")
 @onready var ship = get_tree().get_first_node_in_group("ship") as Node3D
 @onready var reticle = get_tree().get_first_node_in_group("reticle")
 @onready var point = get_tree().get_first_node_in_group("point")
@@ -9,37 +8,16 @@ extends Node3D
 
 var target_position = Vector2()
 
-func _ready() -> void:
-	set_process_input(false)
-
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		reticle.position = ui.screen_size / 2
+		reticle.position = core.ui.screen_size / 2
 
-		target_position = event.position / ui.screen_size
+		target_position = event.position / core.ui.screen_size
 		target_position -= Vector2.ONE * 0.5
 
 		point.position = target_position * 400
 
 func _process(delta: float) -> void:
-	if core.state == core.State.WELCOME:
-		set_process_input(false)
-		rotate((Vector3.FORWARD + Vector3.RIGHT + Vector3.UP).normalized(), 0.1 * delta)
-		return
-	
-	if ui.playing_menu.is_visible():
-		set_process_input(false)
-		return
-	else:
-		set_process_input(true)
-		
-	
-	if core.state != core.State.PLAYING_SOLO \
-		&& core.state != core.State.PLAYING_ONLINE:
-		return
-		
-	set_process_input(true)
-
 	if Input.is_key_pressed(KEY_F3):
 		f3_infos.set_text("%s" % position)
 		f3_infos.set_visible(true)

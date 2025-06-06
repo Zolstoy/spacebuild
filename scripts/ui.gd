@@ -23,6 +23,7 @@ extends Control
 @onready var back_to_game_button = get_tree().get_first_node_in_group("back_to_game_button")
 @onready var reticle = get_tree().get_first_node_in_group("reticle")
 @onready var loading = get_tree().get_first_node_in_group("loading")
+@onready var connecting = get_tree().get_first_node_in_group("connecting")
 
 var state = State.UI.MODAL_SOLO
 var root = null

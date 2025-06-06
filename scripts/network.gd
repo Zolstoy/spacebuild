@@ -50,6 +50,7 @@ func _process(delta):
 		#else:
 			#new_state = State.WELCOME
 		close_timer = 0
+		set_process(false)
 
 	if socket_state == WebSocketPeer.STATE_OPEN:
 		if state == State.Network.CONNECTING:
@@ -73,6 +74,10 @@ func _process(delta):
 				else:
 					print("Login success, id is %s" % variant["message"])
 					core.spawner.set_process(true)
+					core.player.set_process(true)
+					core.player.set_process_input(true)
+					core.ui.conneting.visible = false
+					core.player.reticle.visible = true
 					new_network_state = State.Network.WAITING_GAMEINFO
 					if core.server.state == State.Server.RUNNING:
 						new_state = State.Core.PLAYING_SOLO
@@ -154,5 +159,7 @@ func connect_to_server(host: String, port: int, secure: bool):
 		return
 
 	print("Connecting to %s" % url)
+	core.ui.loading.visible = false
+	core.ui.connecting.visible = true
 	state = State.Network.CONNECTING
 	set_process(true)

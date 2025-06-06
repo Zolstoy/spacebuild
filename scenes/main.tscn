@@ -21,13 +21,22 @@ script = ExtResource("5_ya4ey")
 [node name="Network" type="Node" parent="." groups=["network"]]
 script = ExtResource("1_jyhfs")
 
+[node name="Player" parent="." instance=ExtResource("5_85g3d")]
+
+[node name="Reticle" type="Sprite2D" parent="." groups=["reticle"]]
+visible = false
+scale = Vector2(0.085, 0.085)
+texture = ExtResource("3_85g3d")
+
+[node name="Point" type="Sprite2D" parent="Reticle" groups=["point"]]
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("4_choun")
+
 [node name="Server" type="Node" parent="." groups=["server"]]
 script = ExtResource("2_o6xl0")
 
 [node name="Spawner" type="Node3D" parent="." groups=["spawner"]]
 script = ExtResource("6_tefeu")
-
-[node name="Player" parent="." groups=["player"] instance=ExtResource("5_85g3d")]
 
 [node name="UI" type="Control" parent="." groups=["ui"]]
 layout_mode = 3
@@ -38,15 +47,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_o6xl0")
 script = ExtResource("2_tipki")
-
-[node name="Reticle" type="Sprite2D" parent="UI" groups=["reticle"]]
-visible = false
-scale = Vector2(0.085, 0.085)
-texture = ExtResource("3_85g3d")
-
-[node name="Point" type="Sprite2D" parent="UI/Reticle" groups=["point"]]
-scale = Vector2(0.72, 0.72)
-texture = ExtResource("4_choun")
 
 [node name="Title" type="Label" parent="UI" groups=["title"]]
 layout_mode = 1
@@ -108,7 +108,14 @@ layout_mode = 2
 focus_mode = 0
 text = "Back to game"
 
+[node name="Connecting" type="Label" parent="UI/CenterContainer" groups=["connecting", "loading"]]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Connecting"
+
 [node name="Loading" type="Label" parent="UI/CenterContainer" groups=["loading"]]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 50
 text = "Loading"
