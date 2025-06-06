@@ -76,8 +76,9 @@ func _process(delta):
 					core.spawner.set_process(true)
 					core.player.set_process(true)
 					core.player.set_process_input(true)
-					core.ui.conneting.visible = false
-					core.player.reticle.visible = true
+					core.ui.connecting.visible = false
+					#core.player.reticle.visible = true
+					core.ui.title.visible = false
 					new_network_state = State.Network.WAITING_GAMEINFO
 					if core.server.state == State.Server.RUNNING:
 						new_state = State.Core.PLAYING_SOLO

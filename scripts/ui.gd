@@ -24,6 +24,7 @@ extends Control
 @onready var reticle = get_tree().get_first_node_in_group("reticle")
 @onready var loading = get_tree().get_first_node_in_group("loading")
 @onready var connecting = get_tree().get_first_node_in_group("connecting")
+@onready var title = get_tree().get_first_node_in_group("title")
 
 var state = State.UI.MODAL_SOLO
 var root = null
@@ -89,26 +90,21 @@ func _create_button_pressed():
 	world_field.set_text("")
 
 func _play_button_pressed():
-	playing_menu.disabled = true
 	if state == State.UI.MODAL_ONLINE:
 		core.play_online()
 	elif state == State.UI.MODAL_SOLO:
-		core.play_solo(core.PlaySoloMode.JOIN)
+		core.play_solo(State.LaunchMode.JOIN)
 	else:
 		assert(false)
 
 func _quit_pressed() -> void:
 	core.quit()
 
-func switch(next_state: State.UI):
-	if next_state == State.UI.GAME_HUD:
-		playing_menu.disabled = false
-	
 func _gamemode_changed(tab_id):
 	if tab_id == 1:
-		switch(State.UI.MODAL_ONLINE)
+		state = State.UI.MODAL_ONLINE
 	elif tab_id == 0:
-		switch(State.UI.MODAL_SOLO)
+		state = State.UI.MODAL_SOLO
 
 func _worlds_item_selected():
 	selected_world = worlds_tree.get_selected()

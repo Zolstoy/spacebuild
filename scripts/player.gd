@@ -8,6 +8,9 @@ extends Node3D
 
 var target_position = Vector2()
 
+func _ready():
+	set_process(false)
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		reticle.position = core.ui.screen_size / 2
@@ -60,7 +63,7 @@ func _process(delta: float) -> void:
 		
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			translate(vec.normalized() * 10 * delta)
-		if core.socket.send_text(JSON.stringify(action)) != OK:
+		if core.network.socket.send_text(JSON.stringify(action)) != OK:
 			print("Send error")
 	else:
 		reticle.set_visible(false)
