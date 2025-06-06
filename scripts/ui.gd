@@ -1,6 +1,4 @@
-class_name UI extends Control
-
-enum State {MODAL_SOLO, MODAL_ONLINE, GAME_HUD}
+extends Control
 
 @onready var core = get_tree().get_first_node_in_group("core")
 @onready var worlds_tree: Tree = get_tree().get_first_node_in_group("worlds_tree")
@@ -24,8 +22,9 @@ enum State {MODAL_SOLO, MODAL_ONLINE, GAME_HUD}
 @onready var leave_button = get_tree().get_first_node_in_group("leave_game_button")
 @onready var back_to_game_button = get_tree().get_first_node_in_group("back_to_game_button")
 @onready var reticle = get_tree().get_first_node_in_group("reticle")
+@onready var loading = get_tree().get_first_node_in_group("loading")
 
-var state: State = State.MODAL_SOLO
+var state = State.UI.MODAL_SOLO
 var root = null
 var selected_world = null
 
@@ -51,7 +50,6 @@ func _ready() -> void:
 
 	_on_encrypted_switch_toggled(false)
 	_on_size_changed()
-	#refresh(core.state, welcome_state)
 
 	if OS.has_feature("web"):
 		gamemode_tabs.remove_child(solo_tab)
@@ -86,13 +84,14 @@ func _on_encrypted_switch_toggled(toggled):
 
 func _create_button_pressed():
 	list_worlds()
-	core.play_solo(core.PlaySoloMode.CREATION)
+	core.play_solo(State.LaunchMode.CREATION)
 	world_field.set_text("")
 
 func _play_button_pressed():
-	if state == State.MODAL_ONLINE:
+	playing_menu.disabled = true
+	if state == State.UI.MODAL_ONLINE:
 		core.play_online()
-	elif state == State.MODAL_SOLO:
+	elif state == State.UI.MODAL_SOLO:
 		core.play_solo(core.PlaySoloMode.JOIN)
 	else:
 		assert(false)
@@ -100,15 +99,15 @@ func _play_button_pressed():
 func _quit_pressed() -> void:
 	core.quit()
 
-func switch(next_state: State):
-	if next_state == State.GAME_HUD:
+func switch(next_state: State.UI):
+	if next_state == State.UI.GAME_HUD:
 		playing_menu.disabled = false
 	
 func _gamemode_changed(tab_id):
 	if tab_id == 1:
-		switch(State.MODAL_ONLINE)
+		switch(State.UI.MODAL_ONLINE)
 	elif tab_id == 0:
-		switch(State.MODAL_SOLO)
+		switch(State.UI.MODAL_SOLO)
 
 func _worlds_item_selected():
 	selected_world = worlds_tree.get_selected()
@@ -124,7 +123,7 @@ func _on_login_changed(_text):
 	play_button.disabled = login_field.get_text().is_empty()
 
 func _on_world_changed(_text):
-	create_button.disabled =!world_field.get_text().is_empty()
+	create_button.disabled =world_field.get_text().is_empty()
 
 func _on_size_changed():
 	var new_screen_size = get_viewport().get_visible_rect().size

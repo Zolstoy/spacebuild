@@ -1,11 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://cj5ip8gskegxr"]
+[gd_scene load_steps=11 format=3 uid="uid://cj5ip8gskegxr"]
 
+[ext_resource type="Script" uid="uid://bg4leeovj7xm7" path="res://scripts/network.gd" id="1_jyhfs"]
 [ext_resource type="Theme" uid="uid://dxkx538kc58lm" path="res://theme/theme.tres" id="1_o6xl0"]
-[ext_resource type="Script" uid="uid://cl70mhwnjedo8" path="res://scenes/network.gd" id="2_85g3d"]
 [ext_resource type="Script" uid="uid://6b87mmpt3cmq" path="res://scripts/server.gd" id="2_o6xl0"]
 [ext_resource type="Script" uid="uid://brrsqmjmrhj3o" path="res://scripts/ui.gd" id="2_tipki"]
 [ext_resource type="Texture2D" uid="uid://cexmci72sm7qs" path="res://data/reticle.png" id="3_85g3d"]
 [ext_resource type="Texture2D" uid="uid://du3hcd5ouqwci" path="res://data/point.png" id="4_choun"]
+[ext_resource type="PackedScene" uid="uid://boe4j44i6me18" path="res://scenes/player.tscn" id="5_85g3d"]
 [ext_resource type="Script" uid="uid://b561buoe1ij7s" path="res://scripts/core.gd" id="5_ya4ey"]
 [ext_resource type="Script" uid="uid://kh11lh6iphty" path="res://scripts/spawner.gd" id="6_tefeu"]
 
@@ -18,13 +19,15 @@ bg_color = Color(0.6, 0.6, 0.6, 0)
 script = ExtResource("5_ya4ey")
 
 [node name="Network" type="Node" parent="." groups=["network"]]
-script = ExtResource("2_85g3d")
+script = ExtResource("1_jyhfs")
 
 [node name="Server" type="Node" parent="." groups=["server"]]
 script = ExtResource("2_o6xl0")
 
 [node name="Spawner" type="Node3D" parent="." groups=["spawner"]]
 script = ExtResource("6_tefeu")
+
+[node name="Player" parent="." groups=["player"] instance=ExtResource("5_85g3d")]
 
 [node name="UI" type="Control" parent="." groups=["ui"]]
 layout_mode = 3
@@ -37,31 +40,13 @@ theme = ExtResource("1_o6xl0")
 script = ExtResource("2_tipki")
 
 [node name="Reticle" type="Sprite2D" parent="UI" groups=["reticle"]]
-position = Vector2(445, 445)
+visible = false
 scale = Vector2(0.085, 0.085)
 texture = ExtResource("3_85g3d")
 
 [node name="Point" type="Sprite2D" parent="UI/Reticle" groups=["point"]]
 scale = Vector2(0.72, 0.72)
 texture = ExtResource("4_choun")
-
-[node name="Server" type="RichTextLabel" parent="UI" groups=["server_logs"]]
-custom_minimum_size = Vector2(300, 600)
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -358.0
-offset_right = 300.0
-offset_bottom = 356.0
-grow_vertical = 2
-focus_mode = 1
-theme_override_font_sizes/normal_font_size = 10
-scroll_active = false
-scroll_following = true
-shortcut_keys_enabled = false
-deselect_on_focus_loss_enabled = false
-drag_and_drop_selection_enabled = false
 
 [node name="Title" type="Label" parent="UI" groups=["title"]]
 layout_mode = 1
@@ -102,6 +87,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer2" type="PanelContainer" parent="UI/CenterContainer" groups=["playing_menu"]]
+visible = false
 custom_minimum_size = Vector2(450, 350)
 layout_mode = 2
 

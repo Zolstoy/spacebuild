@@ -1,10 +1,10 @@
-class_name Spawner extends Node3D
+extends Node3D
 
 #class Galactic:
 	#var Name: String
 	#var Level: int
 
-@onready var core: Core = get_tree().get_first_node_in_group("core")
+@onready var core = get_tree().get_first_node_in_group("core")
 @onready var info = get_tree().get_first_node_in_group("info")
 
 @onready var asteroid_scene: Resource = load("res://scenes/asteroid.tscn")
@@ -18,6 +18,9 @@ var to_instantiate: Array = []
 var sync_span: float = 1
 var instantiate_timer: float = 0
 var instantiate_limit: float = 0.01
+
+func _ready() -> void:
+	set_process(false)
 
 func _process(delta: float) -> void:
 	for key in bodies_infos:
@@ -44,7 +47,7 @@ func _process(delta: float) -> void:
 		if body_info.has("velocity"):
 			body.translate(body_info["velocity"] * delta)
 
-	if core.state != Core.State.PLAYING_SOLO && core.state != Core.State.PLAYING_ONLINE:
+	if core.state != State.Core.PLAYING_SOLO && core.state != State.Core.PLAYING_ONLINE:
 		instantiate_timer = 0
 	else:
 		instantiate_timer += delta
