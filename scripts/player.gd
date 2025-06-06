@@ -20,7 +20,6 @@ func _input(event: InputEvent) -> void:
 		target_position -= Vector2.ONE * 0.5
 
 		point.position = target_position * 400
-		
 
 func _process(delta: float) -> void:
 	if core.state == core.State.WELCOME:
@@ -65,7 +64,6 @@ func _process(delta: float) -> void:
 
 		var vec = target.global_position - position
 		
-		#look_at(target.global_position, vec.cross(Vector3.RIGHT))
 		look_at(target.global_position, vec.cross(-basis.x))
 		
 		action["ShipState"]["direction"][0] = -vec.x
@@ -81,7 +79,6 @@ func _process(delta: float) -> void:
 		ship.rotate(Vector3.DOWN, clampf(target_position.x, -clamp_val, clamp_val))
 		ship.rotate(Vector3.BACK, clampf(target_position.x * turn_factor,
 			-clamp_val * turn_factor, clamp_val * turn_factor))
-		
 		
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			translate(vec.normalized() * 10 * delta)

@@ -1,69 +1,47 @@
 class_name Core extends Node
 
 enum State {INIT, WELCOME, WAITING_PORT, LOADING, PLAYING_SOLO, PLAYING_ONLINE, LEAVING, STOPPING_GAME, QUITTING}
-
-
 enum PlaySoloMode {CREATION, JOIN}
 
-
-var socket = WebSocketPeer.new()
-
-var login = ""
-
-var state = State.INIT
-
-var server_process_state = Server.State.NOT_RUNNING
-
-
-
-
-var close_timer = 0
-
-
-
-
-
-
-var resync_timer = 0
-
-
 @onready var server = get_tree().get_first_node_in_group("server")
-
-
 @onready var container = get_tree().get_first_node_in_group("container") as Node3D
 @onready var network = get_tree().get_first_node_in_group("network") as Network
-
 @onready var player = get_tree().get_first_node_in_group("player")
-
 @onready var ui = get_tree().get_first_node_in_group("ui")
 
+var login = ""
+var state = State.INIT
+var server_process_state = Server.State.NOT_RUNNING
+var close_timer = 0
+var resync_timer = 0
 
-func switch(new_state: State) -> void:
-	if dest_core_state == core.State.WELCOME:
-		if core.state != core.State.WELCOME:
-			reticle.set_visible(false)
-			playing_menu.set_visible(false)
-			var galactics = core.container.get_children()
-			for galactic in galactics:
-				core.container.remove_child(galactic)
-		else:
-			if dest_ui_welcome_state == WelcomeState.SOLO:
-				if core.state != core.State.WELCOME:
-					list_worlds()
-				if welcome_state != WelcomeState.SOLO:
-					play_button.set_disabled(true)
-					delete_button.set_disabled(true)
-				else:
-					play_button.set_disabled(selected_world == null)
-					delete_button.set_disabled(selected_world == null)
-					create_button.set_disabled(world_field.get_text().is_empty())
-			elif dest_ui_welcome_state == WelcomeState.ONLINE:
-				play_button.set_disabled(login_field.get_text().is_empty())
-	elif core.state == core.State.INIT:
-		if dest_ui_welcome_state == WelcomeState.SOLO:
-				list_worlds()
-				play_button.set_disabled(true)
-	welcome_state = dest_ui_welcome_state
+func switch(next_state: State) -> void:
+	state = next_state
+	#if new_state == State.WELCOME:
+		#if state != State.WELCOME:
+			#ui.reticle.set_visible(false)
+			#playing_menu.set_visible(false)
+			#var galactics = core.container.get_children()
+			#for galactic in galactics:
+				#core.container.remove_child(galactic)
+		#else:
+			#if dest_ui_welcome_state == WelcomeState.SOLO:
+				#if core.state != core.State.WELCOME:
+					#list_worlds()
+				#if welcome_state != WelcomeState.SOLO:
+					#play_button.set_disabled(true)
+					#delete_button.set_disabled(true)
+				#else:
+					#play_button.set_disabled(selected_world == null)
+					#delete_button.set_disabled(selected_world == null)
+					#create_button.set_disabled(world_field.get_text().is_empty())
+			#elif dest_ui_welcome_state == WelcomeState.ONLINE:
+				#play_button.set_disabled(login_field.get_text().is_empty())
+	#elif core.state == core.State.INIT:
+		#if dest_ui_welcome_state == WelcomeState.SOLO:
+				#list_worlds()
+				#play_button.set_disabled(true)
+	#welcome_state = dest_ui_welcome_state
 
 
 func _notification(what):
@@ -96,7 +74,7 @@ func _ready() -> void:
 	##network_state = to_network_state
 	#
 
-func quit_now(wait_threads):
+func quit_now():
 	server.quit()
 	get_tree().quit()
 
@@ -105,7 +83,7 @@ func leave():
 		return
 	assert(state != State.QUITTING && state != State.LOADING)
 	print("Leaving...")
-	socket.close()
+	network.socket.close()
 	#refresh(State.LEAVING, network_state)
 
 
@@ -116,7 +94,7 @@ func quit() -> void:
 		state = State.QUITTING
 	else:
 		print("Server not running, quitting now!")
-		quit_now(false)
+		quit_now()
 
 func play_solo(play_mode) -> void:
 	var _output = []

@@ -2,6 +2,11 @@ class_name Server extends Node
 
 enum State {NOT_RUNNING, WAITING_PORT, RUNNING}
 
+@onready var core = get_tree().get_first_node_in_group("core")
+@onready var server_logs = get_tree().get_first_node_in_group("server_logs")
+@onready var ui = get_tree().get_first_node_in_group("ui")
+@onready var network = get_tree().get_first_node_in_group("network")
+
 var state: State = State.NOT_RUNNING
 var process = null
 var regex = RegEx.new()
@@ -11,10 +16,6 @@ var server_logs_out_thread: Thread
 var server_logs_err_thread: Thread
 var server_url: String = ""
 var stop_timer = 0
-@onready var core = get_tree().get_first_node_in_group("core")
-@onready var server_logs = get_tree().get_first_node_in_group("server_logs")
-@onready var ui = get_tree().get_first_node_in_group("ui")
-@onready var network = get_tree().get_first_node_in_group("network")
 
 func quit():
 	if state != State.NOT_RUNNING:
