@@ -66,13 +66,13 @@ func _process(delta):
 
 		process = Dictionary()
 		return
-#
-	#if state == State.Server.RUNNING:
-		#if !process.is_empty() && !OS.is_process_running(process["pid"]):
-			#state = State.Server.NOT_RUNNING
-			##refresh(State.WELCOME, _state)
-			#server_logs_err_thread.wait_to_finish()
-			#server_logs_out_thread.wait_to_finish()
+
+	if state == State.Server.RUNNING:
+		if !process.is_empty() && !OS.is_process_running(process["pid"]):
+			state = State.Server.NOT_RUNNING
+			#refresh(State.WELCOME, _state)
+			server_logs_err_thread.wait_to_finish()
+			server_logs_out_thread.wait_to_finish()
 
 func _server_logs(key):
 	var pipe = process[key] as FileAccess
@@ -115,7 +115,7 @@ func launch(world_name):
 			"--instance", instance_path, "--trace-level", "INFO"]
 		process = OS.execute_with_pipe(server_path, args)
 	else:
-		var args = ["0", "--instance", ProjectSettings.globalize_path("user://%s.sbdb" % world_name), "--trace-level", "INFO"]
+		var args = ["0", "--instance", ProjectSettings.globalize_path("user://%s.sbdb" % world_name), "--trace-level", "TRACE"]
 		process = OS.execute_with_pipe("./spacebuild-server", args)
 
 	if process.is_empty():

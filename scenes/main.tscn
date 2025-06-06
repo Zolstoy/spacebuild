@@ -22,6 +22,7 @@ script = ExtResource("5_ya4ey")
 script = ExtResource("1_jyhfs")
 
 [node name="Player" parent="." instance=ExtResource("5_85g3d")]
+visible = false
 
 [node name="Reticle" type="Sprite2D" parent="." groups=["reticle"]]
 visible = false

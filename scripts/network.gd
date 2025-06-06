@@ -78,6 +78,7 @@ func _process(delta):
 					core.player.set_process_input(true)
 					core.ui.connecting.visible = false
 					#core.player.reticle.visible = true
+					core.player.visible = true
 					core.ui.title.visible = false
 					new_network_state = State.Network.WAITING_GAMEINFO
 					if core.server.state == State.Server.RUNNING:

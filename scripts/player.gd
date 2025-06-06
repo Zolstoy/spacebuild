@@ -27,7 +27,9 @@ func _process(delta: float) -> void:
 	else:
 		f3_infos.set_visible(false)
 	
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) || Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+	if !Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) && !Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		reticle.set_visible(false)
+	else:
 		reticle.set_visible(true)
 		
 		var action = Dictionary()
@@ -65,5 +67,3 @@ func _process(delta: float) -> void:
 			translate(vec.normalized() * 10 * delta)
 		if core.network.socket.send_text(JSON.stringify(action)) != OK:
 			print("Send error")
-	else:
-		reticle.set_visible(false)
