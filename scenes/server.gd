@@ -10,16 +10,17 @@ var port = 0
 var server_logs_out_thread: Thread
 var server_logs_err_thread: Thread
 var server_url: String = ""
-
+var stop_timer = 0
 @onready var core = get_tree().get_first_node_in_group("core")
 @onready var server_logs = get_tree().get_first_node_in_group("server_logs")
 @onready var ui = get_tree().get_first_node_in_group("ui")
 @onready var network = get_tree().get_first_node_in_group("network")
 
 func quit():
-	print("Waiting threads")
-	server_logs_err_thread.wait_to_finish()
-	server_logs_out_thread.wait_to_finish()
+	if state != State.NOT_RUNNING:
+		print("Waiting threads")
+		server_logs_err_thread.wait_to_finish()
+		server_logs_out_thread.wait_to_finish()
 
 func _ready():
 	regex.compile("^.*Server loop starts, listenning on (\\d+)$")
@@ -32,7 +33,7 @@ func _server_logs(key):
 		var line = pipe.get_line()
 		if pipe.eof_reached():
 			break
-			
+
 		if line.is_empty():
 			line_empty_cnt += 1
 			if line_empty_cnt == 10:
@@ -53,7 +54,7 @@ func _server_logs(key):
 		if !OS.has_feature("release"):
 			server_logs.call_deferred("append_text", line)
 			server_logs.call_deferred("newline")
-	
+
 	print("Server log (%s) thread quitting now!" % key)
 
 
@@ -112,46 +113,46 @@ func _process(delta):
 		mutex.lock()
 		var locked_port = port
 		mutex.unlock()
-		
+
 		if !locked_port:
 			return
-		
+
 		server_url += ":%d" % locked_port
 		print("Connecting to %s..." % server_url)
 		network.connect_to_server()
 
-	if state == State.STOPPING_GAME || state == State.QUITTING:
+	if core.state == Core.State.STOPPING_GAME || core.state == Core.State.QUITTING:
 		stop_timer += delta;
-		
-		if !OS.is_process_running(server["pid"]):
-			if state == State.QUITTING:
-				quit_now(true);
+
+		if !OS.is_process_running(process["pid"]):
+			if core.state == Core.State.QUITTING:
+				core.quit_now(true);
 			else:
-				server = Dictionary()
-				server_process_state = ServerProcessState.NOT_RUNNING
-				refresh(State.WELCOME, network_state)
+				process = Dictionary()
+				state = State.NOT_RUNNING
+				#refresh(State.WELCOME, network_state)
 				stop_timer = 0
 				return
-				
+
 		if stop_timer < 10:
 			return ;
-			
+
 		stop_timer = 0
 
 		print("Killing server!")
-		OS.kill(server["pid"])
-		server_process_state = ServerProcessState.NOT_RUNNING
+		OS.kill(process["pid"])
+		state = State.NOT_RUNNING
 
-		if state == State.QUITTING:
-			quit_now(true)
-			
-		server = Dictionary()
-		refresh(State.WELCOME, network_state)
+		if core.state == Core.State.QUITTING:
+			core.quit_now(true)
+
+		process = Dictionary()
+		#refresh(State.WELCOME, network_state)
 		return
-			
-	if server_process_state == ServerProcessState.RUNNING:
-		if !server.is_empty() && !OS.is_process_running(server["pid"]):
-			server_process_state = ServerProcessState.NOT_RUNNING
-			refresh(State.WELCOME, network_state)
+
+	if state == State.RUNNING:
+		if !process.is_empty() && !OS.is_process_running(process["pid"]):
+			state = State.NOT_RUNNING
+			#refresh(State.WELCOME, network_state)
 			server_logs_err_thread.wait_to_finish()
 			server_logs_out_thread.wait_to_finish()

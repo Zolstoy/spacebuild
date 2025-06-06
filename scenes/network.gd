@@ -10,7 +10,7 @@ var close_timer = 0
 @onready var server = get_tree().get_first_node_in_group("server")
 @onready var spawner = get_tree().get_first_node_in_group("spawner")
 
-var bodies_infos = {}
+
 
 var login_hash = {
 	"Login": {
@@ -19,27 +19,27 @@ var login_hash = {
 }
 
 
-func connect_to_server():
+func connect_to_server(host, port):
 	socket = WebSocketPeer.new()
-	
+
 	var options = TLSOptions.client()
 	if ui.welcome_state == ui.WelcomeState.ONLINE && ui.encrypted_switch.is_pressed():
 		var cert = X509Certificate.new()
 		if cert.load("ca_cert.pem") == OK:
 			options = TLSOptions.client(cert)
-	
-	if socket.connect_to_url(server_uri, options) != OK:
+
+	if socket.connect_to_url(host, options) != OK:
 		printerr("Could not connect")
 		ui.error_placeholder.set_text("Could not connect")
 		ui.play_button.set_disabled(false)
 		#refresh(State.WELCOME, network_state)
 		return
-	
+
 	#refresh(State.LOADING, NetworkState.CONNECTING)
-	
+
 func _process(delta):
 	if state != State.IDLE:
-		
+
 		var new_network_state: State
 		var new_state: Core.State
 		socket.poll()
@@ -60,8 +60,8 @@ func _process(delta):
 					close_timer = 0
 				else:
 					close_timer += delta
-					
-	
+
+
 		elif socket_state == WebSocketPeer.STATE_CLOSED:
 			var code = socket.get_close_code()
 			var reason = socket.get_close_reason()
@@ -73,7 +73,7 @@ func _process(delta):
 			#else:
 				#new_state = State.WELCOME
 			close_timer = 0
-				
+
 
 		elif state == State.CONNECTING && socket_state == WebSocketPeer.STATE_OPEN:
 			if ui.welcome_state == ui.WelcomeState.ONLINE:
@@ -109,7 +109,7 @@ func _process(delta):
 					var coords = variant["Player"]["coords"]
 					#print(coords)
 					core.player.position = Vector3(coords[0], coords[1], coords[2])
-					
+
 				#elif variant.has("PlayersInSystem"):
 					#var elements = variant["PlayersInSystem"] as Array
 					#
@@ -138,12 +138,12 @@ func _process(delta):
 
 				elif variant.has("BodiesInSystem"):
 					var elements = variant["BodiesInSystem"] as Array
-					
+
 					for element in elements:
 						var galactic = spawner.get_node_or_null(str(int(element["id"])))
 						if galactic:
-							var body_info = bodies_infos[int(element["id"])]
-							
+							var body_info = spawner.bodies_infos[int(element["id"])]
+
 							body_info["new_coords"] = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
 							#galactic.position = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
 						else:

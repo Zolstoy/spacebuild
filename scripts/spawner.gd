@@ -1,38 +1,51 @@
 extends Node3D
 
-class Galactic:
-	var Name: String
-	var Level: int
+#class Galactic:
+	#var Name: String
+	#var Level: int
 
+var bodies_infos = {}
 var to_instantiate = []
+@onready var core = get_tree().get_first_node_in_group("core")
+@onready var info = get_tree().get_first_node_in_group("info")
+
+@onready var asteroid_scene = load("res://scenes/asteroid.tscn")
+@onready var planet_scene = load("res://scenes/planet.tscn")
+@onready var moon_scene = load("res://scenes/moon.tscn")
+@onready var star_scene = load("res://scenes/star.tscn")
+@onready var player_scene = load("res://scenes/player.tscn")
+
+var sync_span = 1
+var instantiate_timer = 0
+var instantiate_limit = 0.01
 
 func _process(delta: float) -> void:
-	if state == State.PLAYING_SOLO || state == State.PLAYING_ONLINE:
-			for key in bodies_infos:
-				var body = container.get_node_or_null(str(key)) as Node3D
-				assert(body)
-				var body_info = bodies_infos[key]
-				body_info.timer += delta
-				if !bodies_infos.has(body_info.gravity_center):
-					continue
-				var gravity_center = container.get_node_or_null(str(body_info.gravity_center))
-				assert(gravity_center)
-				#var body_transform = body.transform as Transform3D
-				#body_transform = body_transform.translated(-gravity_center.global_position)
-				#body_transform = body_transform.rotated(Vector3.UP, body_info.rotating_speed * delta)
-				#body_transform = body_transform.translated(gravity_center.global_position)
-				#body.transform = body_transform
-				if body_info.timer >= sync_span:
-					body_info.timer = 0
-					body.position = body_info["new_coords"]
-					if body_info.has("prev_coords"):
-						body_info["velocity"] = (body_info["new_coords"] - body_info["prev_coords"]).normalized()
-					body_info["prev_coords"] = body_info["new_coords"]
-					
-				if body_info.has("velocity"):
-					body.translate(body_info["velocity"] * delta)
+	if core.state == Core.State.PLAYING_SOLO || core.state == Core.State.PLAYING_ONLINE:
+		for key in bodies_infos:
+			var body = get_node_or_null(str(key)) as Node3D
+			assert(body)
+			var body_info = bodies_infos[key]
+			body_info.timer += delta
+			if !bodies_infos.has(body_info.gravity_center):
+				continue
+			var gravity_center = get_node_or_null(str(body_info.gravity_center))
+			assert(gravity_center)
+			#var body_transform = body.transform as Transform3D
+			#body_transform = body_transform.translated(-gravity_center.global_position)
+			#body_transform = body_transform.rotated(Vector3.UP, body_info.rotating_speed * delta)
+			#body_transform = body_transform.translated(gravity_center.global_position)
+			#body.transform = body_transform
+			if body_info.timer >= sync_span:
+				body_info.timer = 0
+				body.position = body_info["new_coords"]
+				if body_info.has("prev_coords"):
+					body_info["velocity"] = (body_info["new_coords"] - body_info["prev_coords"]).normalized()
+				body_info["prev_coords"] = body_info["new_coords"]
 
-		if state != State.PLAYING_SOLO && state != State.PLAYING_ONLINE:
+			if body_info.has("velocity"):
+				body.translate(body_info["velocity"] * delta)
+
+		if core.state != Core.State.PLAYING_SOLO && core.state != Core.State.PLAYING_ONLINE:
 			instantiate_timer = 0
 		else:
 			instantiate_timer += delta
@@ -65,7 +78,7 @@ func _process(delta: float) -> void:
 					(model.material as StandardMaterial3D).albedo_color = color
 					galactic_tree.position = galactic_to_instantiate.coords
 					galactic_tree.set_name(str(int(galactic_to_instantiate.id)))
-					container.add_child(galactic_tree)
+					add_child(galactic_tree)
 					bodies_infos[int(galactic_to_instantiate.id)] = {
 						"timer": 0,
 						"new_coords": galactic_tree.position,

@@ -16,33 +16,55 @@ var server_process_state = Server.State.NOT_RUNNING
 
 
 
-var stop_timer = 0
+
 var close_timer = 0
 
 
-var instantiate_timer = 0
-var instantiate_limit = 0.01
+
 
 
 
 var resync_timer = 0
 
-@onready var asteroid_scene = load("res://scenes/asteroid.tscn")
-@onready var planet_scene = load("res://scenes/planet.tscn")
-@onready var moon_scene = load("res://scenes/moon.tscn")
-@onready var star_scene = load("res://scenes/star.tscn")
-@onready var player_scene = load("res://scenes/player.tscn")
 
 @onready var server = get_tree().get_first_node_in_group("server")
 
 
 @onready var container = get_tree().get_first_node_in_group("container") as Node3D
+@onready var network = get_tree().get_first_node_in_group("network") as Network
+
 @onready var player = get_tree().get_first_node_in_group("player")
 
 @onready var ui = get_tree().get_first_node_in_group("ui")
 
 
-@onready var info = get_tree().get_first_node_in_group("info")
+func switch(new_state: State) -> void:
+	if dest_core_state == core.State.WELCOME:
+		if core.state != core.State.WELCOME:
+			reticle.set_visible(false)
+			playing_menu.set_visible(false)
+			var galactics = core.container.get_children()
+			for galactic in galactics:
+				core.container.remove_child(galactic)
+		else:
+			if dest_ui_welcome_state == WelcomeState.SOLO:
+				if core.state != core.State.WELCOME:
+					list_worlds()
+				if welcome_state != WelcomeState.SOLO:
+					play_button.set_disabled(true)
+					delete_button.set_disabled(true)
+				else:
+					play_button.set_disabled(selected_world == null)
+					delete_button.set_disabled(selected_world == null)
+					create_button.set_disabled(world_field.get_text().is_empty())
+			elif dest_ui_welcome_state == WelcomeState.ONLINE:
+				play_button.set_disabled(login_field.get_text().is_empty())
+	elif core.state == core.State.INIT:
+		if dest_ui_welcome_state == WelcomeState.SOLO:
+				list_worlds()
+				play_button.set_disabled(true)
+	welcome_state = dest_ui_welcome_state
+
 
 func _notification(what):
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -73,17 +95,7 @@ func _ready() -> void:
 	#state = to_state
 	##network_state = to_network_state
 	#
-func _process(delta: float) -> void:
-	if state == State.INIT:
-		#refresh(State.WELCOME, network_state)
-		return
 
-	var sync_span = 1
-
-
-
-
-			
 func quit_now(wait_threads):
 	server.quit()
 	get_tree().quit()
@@ -113,7 +125,7 @@ func play_solo(play_mode) -> void:
 		world_name = ui.world_field.get_text()
 	elif play_mode == PlaySoloMode.JOIN:
 		world_name = ui.worlds_tree.get_selected().get_text(0)
-		
+
 	assert(!world_name.is_empty())
 	server.launch(world_name)
 
@@ -128,14 +140,11 @@ func play_online() -> void:
 	var host_str = ui.host_field.get_text()
 	if host_str.is_empty():
 		host_str = "localhost"
-		
+
 	var port_str = ui.port_field.get_text()
 	if port_str.is_empty():
 		port_str = "2567"
-		
-	var protocol_str = "wss" if ui.encrypted_switch.is_pressed() else "ws"
-	
-	server_uri = "%s://%s" % [protocol_str, host_str]
-	server_port = int(port_str)
 
-	connect_to_server()
+	var protocol_str = "wss" if ui.encrypted_switch.is_pressed() else "ws"
+
+	network.connect_to_server("%s://%s" % [protocol_str, host_str], int(port_str))

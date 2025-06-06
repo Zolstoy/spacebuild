@@ -1,8 +1,8 @@
 extends Control
 
-enum WelcomeState {SOLO, ONLINE}
+enum State {MODAL_SOLO, MODAL_ONLINE}
 
-var welcome_state = WelcomeState.SOLO
+var state = State.MODAL_SOLO
 var root = null
 var selected_world = null
 
@@ -32,7 +32,7 @@ var selected_world = null
 func _ready() -> void:
 	root = worlds_tree.create_item()
 	worlds_tree.hide_root = true
-	
+
 	get_tree().get_root().size_changed.connect(_on_size_changed)
 
 	login_field.text_changed.connect(_on_login_changed)
@@ -52,13 +52,13 @@ func _ready() -> void:
 	_on_encrypted_switch_toggled(false)
 	_on_size_changed()
 	refresh(core.state, welcome_state)
-	
+
 	if OS.has_feature("web"):
 		gamemode_tabs.remove_child(solo_tab)
 
 func _leave_button_pressed():
 	core.leave()
-	
+
 func _back_to_game_button_pressed():
 	playing_menu.set_visible(false);
 
@@ -83,32 +83,6 @@ func _on_encrypted_switch_toggled(toggled):
 	else:
 		encrypted_switch.set_text("off")
 
-func refresh(dest_core_state, dest_ui_welcome_state) -> void:
-	if dest_core_state == core.State.WELCOME:
-		if core.state != core.State.WELCOME:
-			reticle.set_visible(false)
-			playing_menu.set_visible(false)
-			var galactics = core.container.get_children()
-			for galactic in galactics:
-				core.container.remove_child(galactic)
-		else:
-			if dest_ui_welcome_state == WelcomeState.SOLO:
-				if core.state != core.State.WELCOME:
-					list_worlds()
-				if welcome_state != WelcomeState.SOLO:
-					play_button.set_disabled(true)
-					delete_button.set_disabled(true)
-				else:
-					play_button.set_disabled(selected_world == null)
-					delete_button.set_disabled(selected_world == null)
-					create_button.set_disabled(world_field.get_text().is_empty())
-			elif dest_ui_welcome_state == WelcomeState.ONLINE:
-				play_button.set_disabled(login_field.get_text().is_empty())
-	elif core.state == core.State.INIT:
-		if dest_ui_welcome_state == WelcomeState.SOLO:
-				list_worlds()
-				play_button.set_disabled(true)
-	welcome_state = dest_ui_welcome_state
 
 func _create_button_pressed():
 	list_worlds()
@@ -156,7 +130,7 @@ func _on_size_changed():
 	#var ref = screen_size
 	#set_scale((new_screen_size / ref).clamp(Vector2.ONE * 0.1, Vector2.ONE * 1000))
 	screen_size = new_screen_size
-	
+
 func list_worlds():
 	var dir = DirAccess.open("user://")
 	var files = dir.get_files()
