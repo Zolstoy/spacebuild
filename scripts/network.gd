@@ -24,7 +24,7 @@ func _process(delta):
 
 	var socket_state = socket.get_ready_state()
 	if socket_state == WebSocketPeer.STATE_CLOSING:
-		if core.state == core.State.LEAVING:
+		if core.state == State.Core.LEAVING:
 			if close_timer == 0:
 				print("Closing")
 				new_network_state = State.Network.CLOSING

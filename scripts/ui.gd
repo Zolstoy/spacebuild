@@ -64,7 +64,7 @@ func _back_to_game_button_pressed():
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
-		if core.state == core.State.PLAYING_SOLO || core.state == core.State.PLAYING_ONLINE:
+		if core.state == State.Core.PLAYING_SOLO || core.state == State.Core.PLAYING_ONLINE:
 			playing_menu.set_visible(!playing_menu.is_visible());
 
 func _open_folder_button_pressed():
