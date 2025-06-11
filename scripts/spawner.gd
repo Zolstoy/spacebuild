@@ -69,4 +69,4 @@ func _process(delta: float) -> void:
 		#instantiate_timer -= instantiate_limit
 		#if instantiate_timer < instantiate_limit:
 			#break
-		to_instantiate.clear()
+	to_instantiate.clear()
