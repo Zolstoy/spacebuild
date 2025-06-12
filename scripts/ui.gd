@@ -133,7 +133,7 @@ func list_worlds():
 	root = worlds_tree.create_item()
 	for file in files:
 		var orig = file
-		var trimmed = file.trim_suffix(".sbdb")
+		var trimmed = file.trim_suffix(".db")
 		if trimmed != orig:
 			var item = worlds_tree.create_item(root) as TreeItem
 			item.set_text(0, trimmed)

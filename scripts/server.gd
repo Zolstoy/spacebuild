@@ -109,13 +109,13 @@ func _server_logs(key):
 func launch(world_name):
 	if !OS.has_feature("release"):
 		var server_path = ProjectSettings.globalize_path("res://server")
-		var instance_path = ProjectSettings.globalize_path("user://%s.sbdb" % world_name)
+		var instance_path = ProjectSettings.globalize_path("user://%s.db" % world_name)
 
 		var args = ["0",
-			"--instance", instance_path, "--trace-level", "TRACE"]
+			"--instance", instance_path, "--trace-level", "INFO"]
 		process = OS.execute_with_pipe(server_path, args)
 	else:
-		var args = ["0", "--instance", ProjectSettings.globalize_path("user://%s.sbdb" % world_name), "--trace-level", "TRACE"]
+		var args = ["0", "--instance", ProjectSettings.globalize_path("user://%s.db" % world_name), "--trace-level", "INFO"]
 		process = OS.execute_with_pipe("./spacebuild-server", args)
 
 	if process.is_empty():

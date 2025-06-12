@@ -96,15 +96,17 @@ func _process(delta):
 					for element in elements:
 						var id = int(element["id"])
 						assert(id > 0)
-						if core.spawner.bodies_infos.has(id):
-							var galactic = core.spawner.bodies_info[id]
-							galactic["new_coords"] = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
-						else:
-							core.spawner.to_instantiate.push_back({
-								"id": id,
+						var galactic_node = core.spawner.get_node_or_null(str(id))
+						var new_coords = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
+						if galactic_node:
+							galactic_node.position = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
+						elif !core.spawner.to_instantiate.has(id):
+							core.spawner.to_instantiate[id] = {
 								"type": element["element_type"],
-								"coords": Vector3(element["coords"][0], element["coords"][1], element["coords"][2]),
-								})
+								"coords": new_coords,
+							}
+						else:
+							core.spawner.to_instantiate[id].coords = new_coords
 	if new_network_state:
 		state = new_network_state
 	if new_state:
