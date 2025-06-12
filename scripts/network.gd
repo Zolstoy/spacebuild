@@ -88,56 +88,22 @@ func _process(delta):
 		elif state == State.Network.WAITING_GAMEINFO:
 			while socket.get_available_packet_count():
 				var variant = JSON.parse_string(socket.get_packet().get_string_from_utf8())
-				#print("Received: %s" % variant)
-				#var galactics = container.get_children()
 				if variant.has("Player"):
 					var coords = variant["Player"]["coords"]
-					#print(coords)
 					core.player.position = Vector3(coords[0], coords[1], coords[2])
-
-				elif variant.has("PlayersInSystem"):
-					var elements = variant["PlayersInSystem"] as Array
-					
-					for galactic in galactics:
-						var found = false
-						for element in elements:
-							if element["id"] == galactic.get_name():
-								found = true
-								break
-						if !found:
-							remove_child(galactic)
-							
-					
-					for element in elements:
-						var found = false
-						for galactic in galactics:
-							if galactic.get_name() == element["id"]:
-								galactic.position = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
-								found = true
-								break
-						if !found:
-							core.spawner.to_instantiate.push_back({
-								"id": element["id"],
-								"type": "Player",
-								"coords": Vector3(element["coords"][0], element["coords"][1], element["coords"][2])})
-
 				elif variant.has("BodiesInSystem"):
 					var elements = variant["BodiesInSystem"] as Array
-
 					for element in elements:
-						var galactic = core.spawner.get_node_or_null(str(int(element["id"])))
-						if galactic:
-							var body_info = core.spawner.bodies_infos[int(element["id"])]
-
-							body_info["new_coords"] = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
-							#galactic.position = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
+						var id = int(element["id"])
+						assert(id > 0)
+						if core.spawner.bodies_infos.has(id):
+							var galactic = core.spawner.bodies_info[id]
+							galactic["new_coords"] = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
 						else:
 							core.spawner.to_instantiate.push_back({
-								"id": int(element["id"]),
+								"id": id,
 								"type": element["element_type"],
 								"coords": Vector3(element["coords"][0], element["coords"][1], element["coords"][2]),
-								"gravity_center": int(element["gravity_center"]),
-								"rotating_speed": element["rotating_speed"],
 								})
 	if new_network_state:
 		state = new_network_state
@@ -146,14 +112,14 @@ func _process(delta):
 
 func connect_to_server(host: String, port: int, secure: bool):
 	socket = WebSocketPeer.new()
-	
+
 	var url: String
 	if secure:
 		url = "wss://"
 	else:
 		url = "ws://"
 	url += "%s:%s" % [host, port]
-	
+
 	if socket.connect_to_url(url, null) != OK:
 		printerr("Could not connect")
 		core.ui.error_placeholder.set_text("Could not connect")

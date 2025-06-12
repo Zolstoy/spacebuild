@@ -26,19 +26,19 @@ func _process(_delta: float) -> void:
 		f3_infos.set_visible(true)
 	else:
 		f3_infos.set_visible(false)
-	
+
 	if !Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) && !Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		reticle.set_visible(false)
 	else:
 		reticle.set_visible(true)
-		
+
 		var action = Dictionary()
 		action["ShipState"] = Dictionary()
 		action["ShipState"]["throttle_up"] = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 		action["ShipState"]["direction"] = [0, 0, 0]
-		
+
 		var direction = (Vector3(target_position.x, target_position.y, 0) + Vector3.FORWARD * 10);
-		
+
 		var target = Node3D.new()
 		add_child(target)
 		target.position = Vector3.ZERO
@@ -46,15 +46,15 @@ func _process(_delta: float) -> void:
 		target.translate_object_local(direction)
 
 		var vec = target.global_position - position
-		
+
 		look_at(target.global_position, vec.cross(-basis.x))
-		
+
 		action["ShipState"]["direction"][0] = -vec.x
 		action["ShipState"]["direction"][1] = -vec.y
 		action["ShipState"]["direction"][2] = -vec.z
-		
+
 		remove_child(target)
-		
+
 		ship.rotation = Vector3.ZERO
 		var clamp_val = 0.7
 		var turn_factor = 2
@@ -62,7 +62,7 @@ func _process(_delta: float) -> void:
 		ship.rotate(Vector3.DOWN, clampf(target_position.x, -clamp_val, clamp_val))
 		ship.rotate(Vector3.BACK, clampf(target_position.x * turn_factor,
 			-clamp_val * turn_factor, clamp_val * turn_factor))
-		
+
 		#if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			#translate(vec.normalized() * 10 * delta)
 		if core.network.socket.send_text(JSON.stringify(action)) != OK:

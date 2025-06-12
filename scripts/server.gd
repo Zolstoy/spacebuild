@@ -112,7 +112,7 @@ func launch(world_name):
 		var instance_path = ProjectSettings.globalize_path("user://%s.sbdb" % world_name)
 
 		var args = ["0",
-			"--instance", instance_path, "--trace-level", "INFO"]
+			"--instance", instance_path, "--trace-level", "TRACE"]
 		process = OS.execute_with_pipe(server_path, args)
 	else:
 		var args = ["0", "--instance", ProjectSettings.globalize_path("user://%s.sbdb" % world_name), "--trace-level", "TRACE"]
@@ -133,7 +133,7 @@ func launch(world_name):
 		server_logs_out_thread.wait_to_finish()
 	server_logs_out_thread = Thread.new()
 	server_logs_out_thread.start(_server_logs.bind("stdio"))
-	
+
 	state = State.Server.WAITING_PORT
 	set_process(true)
 
