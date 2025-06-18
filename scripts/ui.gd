@@ -1,17 +1,11 @@
 extends Control
 
-enum WelcomeState {SOLO, ONLINE}
-
-var welcome_state = WelcomeState.SOLO
-var root = null
-var selected_world = null
-
 @onready var core = get_tree().get_first_node_in_group("core")
-@onready var worlds_tree = get_tree().get_first_node_in_group("worlds_tree") as Tree
+@onready var worlds_tree: Tree = get_tree().get_first_node_in_group("worlds_tree")
 @onready var modale = get_tree().get_first_node_in_group("modale")
 @onready var solo_tab = get_tree().get_first_node_in_group("solo_tab")
 @onready var login_field = get_tree().get_first_node_in_group("login_field")
-@onready var play_button = get_tree().get_first_node_in_group("play_button")
+@onready var play_button: Button = get_tree().get_first_node_in_group("play_button")
 @onready var quit_button = get_tree().get_first_node_in_group("quit_button")
 @onready var world_field = get_tree().get_first_node_in_group("world_field")
 @onready var create_button = get_tree().get_first_node_in_group("create_button")
@@ -28,11 +22,18 @@ var selected_world = null
 @onready var leave_button = get_tree().get_first_node_in_group("leave_game_button")
 @onready var back_to_game_button = get_tree().get_first_node_in_group("back_to_game_button")
 @onready var reticle = get_tree().get_first_node_in_group("reticle")
+@onready var loading = get_tree().get_first_node_in_group("loading")
+@onready var connecting = get_tree().get_first_node_in_group("connecting")
+@onready var title = get_tree().get_first_node_in_group("title")
+
+var state = State.UI.MODAL_SOLO
+var root = null
+var selected_world = null
 
 func _ready() -> void:
 	root = worlds_tree.create_item()
 	worlds_tree.hide_root = true
-	
+
 	get_tree().get_root().size_changed.connect(_on_size_changed)
 
 	login_field.text_changed.connect(_on_login_changed)
@@ -51,20 +52,25 @@ func _ready() -> void:
 
 	_on_encrypted_switch_toggled(false)
 	_on_size_changed()
-	refresh(core.state, welcome_state)
-	
+
 	if OS.has_feature("web"):
 		gamemode_tabs.remove_child(solo_tab)
 
+func back_to_welcome():
+	playing_menu.visible = false
+	reticle.visible = false
+	modale.visible = true
+	title.visible = true
+
 func _leave_button_pressed():
 	core.leave()
-	
+
 func _back_to_game_button_pressed():
 	playing_menu.set_visible(false);
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
-		if core.state == core.State.PLAYING_SOLO || core.state == core.State.PLAYING_ONLINE:
+		if core.state == State.Core.PLAYING_SOLO || core.state == State.Core.PLAYING_ONLINE:
 			playing_menu.set_visible(!playing_menu.is_visible());
 
 func _open_folder_button_pressed():
@@ -83,43 +89,17 @@ func _on_encrypted_switch_toggled(toggled):
 	else:
 		encrypted_switch.set_text("off")
 
-func refresh(dest_core_state, dest_ui_welcome_state) -> void:
-	if dest_core_state == core.State.WELCOME:
-		if core.state != core.State.WELCOME:
-			reticle.set_visible(false)
-			playing_menu.set_visible(false)
-			var galactics = core.container.get_children()
-			for galactic in galactics:
-				core.container.remove_child(galactic)
-		else:
-			if dest_ui_welcome_state == WelcomeState.SOLO:
-				if core.state != core.State.WELCOME:
-					list_worlds()
-				if welcome_state != WelcomeState.SOLO:
-					play_button.set_disabled(true)
-					delete_button.set_disabled(true)
-				else:
-					play_button.set_disabled(selected_world == null)
-					delete_button.set_disabled(selected_world == null)
-					create_button.set_disabled(world_field.get_text().is_empty())
-			elif dest_ui_welcome_state == WelcomeState.ONLINE:
-				play_button.set_disabled(login_field.get_text().is_empty())
-	elif core.state == core.State.INIT:
-		if dest_ui_welcome_state == WelcomeState.SOLO:
-				list_worlds()
-				play_button.set_disabled(true)
-	welcome_state = dest_ui_welcome_state
 
 func _create_button_pressed():
 	list_worlds()
-	core.play_solo(core.PlaySoloMode.CREATION)
+	core.play_solo(State.LaunchMode.CREATION)
 	world_field.set_text("")
 
 func _play_button_pressed():
-	if welcome_state == WelcomeState.ONLINE:
+	if state == State.UI.MODAL_ONLINE:
 		core.play_online()
-	elif welcome_state == WelcomeState.SOLO:
-		core.play_solo(core.PlaySoloMode.JOIN)
+	elif state == State.UI.MODAL_SOLO:
+		core.play_solo(State.LaunchMode.JOIN)
 	else:
 		assert(false)
 
@@ -127,36 +107,31 @@ func _quit_pressed() -> void:
 	core.quit()
 
 func _gamemode_changed(tab_id):
-	var dest_welcome_state
 	if tab_id == 1:
-		dest_welcome_state = WelcomeState.ONLINE
+		state = State.UI.MODAL_ONLINE
 	elif tab_id == 0:
-		dest_welcome_state = WelcomeState.SOLO
-	else:
-		assert(false)
-	refresh(core.state, dest_welcome_state)
+		state = State.UI.MODAL_SOLO
 
 func _worlds_item_selected():
 	selected_world = worlds_tree.get_selected()
-	refresh(core.state, welcome_state)
+	play_button.disabled = true
+	delete_button.disabled = true
 
 func _worlds_nothing_selected():
 	selected_world = null
-	refresh(core.state, welcome_state)
+	play_button.disabled = false
+	delete_button.disabled = false
 
 func _on_login_changed(_text):
-	refresh(core.state, welcome_state)
+	play_button.disabled = login_field.get_text().is_empty()
 
 func _on_world_changed(_text):
-	refresh(core.state, welcome_state)
+	create_button.disabled =world_field.get_text().is_empty()
 
 func _on_size_changed():
 	var new_screen_size = get_viewport().get_visible_rect().size
-	#var ref = Vector2(1920, 1080)
-	#var ref = screen_size
-	#set_scale((new_screen_size / ref).clamp(Vector2.ONE * 0.1, Vector2.ONE * 1000))
 	screen_size = new_screen_size
-	
+
 func list_worlds():
 	var dir = DirAccess.open("user://")
 	var files = dir.get_files()
@@ -164,10 +139,7 @@ func list_worlds():
 	root = worlds_tree.create_item()
 	for file in files:
 		var orig = file
-		var trimmed = file.trim_suffix(".sbdb")
+		var trimmed = file.trim_suffix(".db")
 		if trimmed != orig:
 			var item = worlds_tree.create_item(root) as TreeItem
 			item.set_text(0, trimmed)
-
-func _process(_delta: float) -> void:
-	pass

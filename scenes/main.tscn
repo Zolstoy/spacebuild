@@ -1,19 +1,40 @@
-[gd_scene load_steps=10 format=3 uid="uid://cj5ip8gskegxr"]
+[gd_scene load_steps=11 format=3 uid="uid://cj5ip8gskegxr"]
 
+[ext_resource type="Script" uid="uid://bg4leeovj7xm7" path="res://scripts/network.gd" id="1_jyhfs"]
 [ext_resource type="Theme" uid="uid://dxkx538kc58lm" path="res://theme/theme.tres" id="1_o6xl0"]
+[ext_resource type="Script" uid="uid://6b87mmpt3cmq" path="res://scripts/server.gd" id="2_o6xl0"]
 [ext_resource type="Script" uid="uid://brrsqmjmrhj3o" path="res://scripts/ui.gd" id="2_tipki"]
 [ext_resource type="Texture2D" uid="uid://cexmci72sm7qs" path="res://data/reticle.png" id="3_85g3d"]
 [ext_resource type="Texture2D" uid="uid://du3hcd5ouqwci" path="res://data/point.png" id="4_choun"]
+[ext_resource type="PackedScene" uid="uid://boe4j44i6me18" path="res://scenes/player.tscn" id="5_85g3d"]
 [ext_resource type="Script" uid="uid://b561buoe1ij7s" path="res://scripts/core.gd" id="5_ya4ey"]
-[ext_resource type="Script" uid="uid://chac8ev04uob3" path="res://scripts/player.gd" id="6_eb6dy"]
-[ext_resource type="PackedScene" uid="uid://ccsocck3s5afe" path="res://data/spaceship.fbx" id="7_trceg"]
+[ext_resource type="Script" uid="uid://kh11lh6iphty" path="res://scripts/spawner.gd" id="6_tefeu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1u3xw"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
 
-[sub_resource type="Environment" id="Environment_272bh"]
+[node name="Root" type="Node3D"]
 
-[node name="Node3D" type="Node3D"]
+[node name="Core" type="Node" parent="." groups=["core"]]
+script = ExtResource("5_ya4ey")
+
+[node name="Network" type="Node" parent="." groups=["network"]]
+script = ExtResource("1_jyhfs")
+
+[node name="Reticle" type="Sprite2D" parent="." groups=["reticle"]]
+visible = false
+scale = Vector2(0.085, 0.085)
+texture = ExtResource("3_85g3d")
+
+[node name="Point" type="Sprite2D" parent="Reticle" groups=["point"]]
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("4_choun")
+
+[node name="Server" type="Node" parent="." groups=["server"]]
+script = ExtResource("2_o6xl0")
+
+[node name="Spawner" type="Node3D" parent="." groups=["spawner"]]
+script = ExtResource("6_tefeu")
 
 [node name="UI" type="Control" parent="." groups=["ui"]]
 layout_mode = 3
@@ -24,33 +45,6 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_o6xl0")
 script = ExtResource("2_tipki")
-
-[node name="Reticle" type="Sprite2D" parent="UI" groups=["reticle"]]
-position = Vector2(445, 445)
-scale = Vector2(0.085, 0.085)
-texture = ExtResource("3_85g3d")
-
-[node name="Point" type="Sprite2D" parent="UI/Reticle" groups=["point"]]
-scale = Vector2(0.72, 0.72)
-texture = ExtResource("4_choun")
-
-[node name="Server" type="RichTextLabel" parent="UI" groups=["server_logs"]]
-custom_minimum_size = Vector2(300, 600)
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_top = -450.0
-offset_right = 300.0
-offset_bottom = 450.0
-grow_vertical = 2
-focus_mode = 1
-theme_override_font_sizes/normal_font_size = 10
-scroll_active = false
-scroll_following = true
-shortcut_keys_enabled = false
-deselect_on_focus_loss_enabled = false
-drag_and_drop_selection_enabled = false
 
 [node name="Title" type="Label" parent="UI" groups=["title"]]
 layout_mode = 1
@@ -91,6 +85,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="PanelContainer2" type="PanelContainer" parent="UI/CenterContainer" groups=["playing_menu"]]
+visible = false
 custom_minimum_size = Vector2(450, 350)
 layout_mode = 2
 
@@ -111,7 +106,14 @@ layout_mode = 2
 focus_mode = 0
 text = "Back to game"
 
+[node name="Connecting" type="Label" parent="UI/CenterContainer" groups=["connecting", "loading"]]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Connecting"
+
 [node name="Loading" type="Label" parent="UI/CenterContainer" groups=["loading"]]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 50
 text = "Loading"
@@ -365,22 +367,5 @@ offset_right = 80.79
 offset_bottom = 86.49
 grow_horizontal = 2
 
-[node name="Core" type="Node" parent="." groups=["core"]]
-script = ExtResource("5_ya4ey")
-
-[node name="Container" type="Node3D" parent="." groups=["container"]]
-
-[node name="Player" type="Node3D" parent="." groups=["player"]]
-script = ExtResource("6_eb6dy")
-
-[node name="Camera3D" type="Camera3D" parent="Player"]
-transform = Transform3D(-1, 4.34524e-09, -8.87594e-08, -2.17262e-08, 0.956539, 0.291604, 8.61689e-08, 0.291604, -0.956539, -2.38419e-07, 1.36687, -8.80393)
-environment = SubResource("Environment_272bh")
-
-[node name="Ship" parent="Player" groups=["ship"] instance=ExtResource("7_trceg")]
-transform = Transform3D(0.213269, 0, 0, 0, 0.213269, 0, 0, 0, 0.213269, 0, -0.461831, -5.85648)
-
-[node name="SpotLight3D" type="SpotLight3D" parent="Player"]
-transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 0, -10.75)
-spot_range = 20.7038
-spot_angle = 18.2813
+[node name="Player" parent="." instance=ExtResource("5_85g3d")]
+visible = false
