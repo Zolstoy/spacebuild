@@ -26,6 +26,11 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
+[global_group]
+
+player=""
+ship=""
+
 [rendering]
 
 textures/vram_compression/import_etc2_astc=true
