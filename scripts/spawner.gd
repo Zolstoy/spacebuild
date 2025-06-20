@@ -40,6 +40,7 @@ func stop():
 	for node in get_children():
 		remove_child(node);
 	to_instantiate.clear()
+	cache.clear()
 	timer = 0
 	set_process(false)
 

@@ -18,4 +18,4 @@ func _process(delta: float) -> void:
 			gravity_center.add_child(self)
 		return
 
-	#global_rotate(Vector3.UP, rotating_speed * delta)
+	global_rotate(Vector3.UP, rotating_speed * delta * 100)

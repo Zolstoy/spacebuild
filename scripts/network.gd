@@ -27,6 +27,7 @@ func _process(_delta):
 	if socket_state == WebSocketPeer.STATE_CLOSED:
 		socket = WebSocketPeer.new()
 		new_network_state = State.Network.IDLE
+		core.spawner.stop()
 		set_process(false)
 
 	if socket_state == WebSocketPeer.STATE_OPEN:
