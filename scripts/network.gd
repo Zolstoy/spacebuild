@@ -79,7 +79,7 @@ func _process(_delta):
 						var new_coords = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
 						if core.spawner.cache.has(id):
 							var galactic_node = core.spawner.cache[id]
-							galactic_node.global_position = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
+							galactic_node.position = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
 						elif !core.spawner.to_instantiate.has(id):
 							core.spawner.to_instantiate[id] = {
 								"type": element["body_type"],
