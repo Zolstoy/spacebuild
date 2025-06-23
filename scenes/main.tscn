@@ -67,6 +67,7 @@ text = "Space Build"
 horizontal_alignment = 1
 
 [node name="Info" type="Label" parent="UI" groups=["info"]]
+visible = false
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
