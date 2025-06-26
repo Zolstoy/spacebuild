@@ -13,6 +13,8 @@ var state = State.Network.IDLE
 var socket: WebSocketPeer = null
 # var close_timer: float = 0
 var galactics = []
+var ping = 0
+@onready var last_ping_time = Time.get_ticks_msec()
 
 func _ready():
 	set_process(false)
@@ -65,8 +67,14 @@ func _process(_delta):
 						new_state = State.Core.PLAYING_ONLINE
 		elif state == State.Network.WAITING_GAMEINFO:
 			while socket.get_available_packet_count():
-				var variant = JSON.parse_string(socket.get_packet().get_string_from_utf8())
+				var packet_str = socket.get_packet().get_string_from_utf8()
+				if packet_str.is_empty():
+					print("Bad packet")
+				var variant = JSON.parse_string(packet_str)
 				if variant.has("Player"):
+					var now = Time.get_ticks_msec();
+					ping = now - last_ping_time
+					last_ping_time = now
 					var coords = variant["Player"]["coords"]
 					core.player.position = Vector3(coords[0], coords[1], coords[2])
 				elif variant.has("Env"):
@@ -74,8 +82,6 @@ func _process(_delta):
 					for element in elements:
 						var id = int(element["id"])
 						assert(id > 0)
-						#var galactic_node = core.spawner.get_node_or_null(str(id))
-						#var galactic_node = core.spawner.find_child(str(id), true, false)
 						var new_coords = Vector3(element["coords"][0], element["coords"][1], element["coords"][2])
 						if core.spawner.cache.has(id):
 							var galactic_node = core.spawner.cache[id]
@@ -96,6 +102,7 @@ func _process(_delta):
 
 func connect_to_server(host: String, port: int, secure: bool):
 	socket = WebSocketPeer.new()
+	socket.heartbeat_interval = 1
 
 	var url: String
 	if secure:

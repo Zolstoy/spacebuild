@@ -25,10 +25,10 @@ func _process(delta: float) -> void:
 			debug_tree.global_transform = debug_tree.global_transform.scaled(Vector3(1, 1, pos_delta.length()))
 
 		return
-
-	timer += delta
-	#if timer > 1:
-	debug_tree.look_at(gravity_center.global_position, Vector3.UP, true)
+#
+	#timer += delta
+	##if timer > 1:
+	#debug_tree.look_at(gravity_center.global_position, Vector3.UP, true)
 		#timer = 0
 
 	# translate(-gravity_center.position)

@@ -7,6 +7,8 @@ extends Node3D
 @onready var f3_infos = get_tree().get_first_node_in_group("f3_infos")
 
 var target_position = Vector2()
+var timer = 0
+var last_direction = Vector3()
 
 func _ready():
 	set_process(false)
@@ -20,7 +22,8 @@ func _input(event: InputEvent) -> void:
 
 		point.position = target_position * 400
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+
 	if Input.is_key_pressed(KEY_F3):
 		f3_infos.set_text("%s" % position)
 		f3_infos.set_visible(true)
@@ -63,7 +66,13 @@ func _process(_delta: float) -> void:
 		ship.rotate(Vector3.BACK, clampf(target_position.x * turn_factor,
 			-clamp_val * turn_factor, clamp_val * turn_factor))
 
-		#if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			#translate(vec.normalized() * 100 * _delta)
-		if core.network.socket.send_text(JSON.stringify(action)) != OK:
-			print("Send error")
+
+		if timer >= (core.network.ping / 1000.):
+			if core.network.socket.send_text(JSON.stringify(action)) != OK:
+				print("Sent error!")
+			last_direction = vec.normalized()
+			timer = 0
+		else:
+			if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+				translate(-last_direction * 100 * (delta * 0.9))
+	timer += delta
