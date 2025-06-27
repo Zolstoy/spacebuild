@@ -76,7 +76,7 @@ func _process(_delta):
 					ping = now - last_ping_time
 					last_ping_time = now
 					var coords = variant["Player"]["coords"]
-					core.player.position = Vector3(coords[0], coords[1], coords[2])
+					core.player.set_next_position(Vector3(coords[0], coords[1], coords[2]))
 				elif variant.has("Env"):
 					var elements = variant["Env"] as Array
 					for element in elements:

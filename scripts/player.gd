@@ -9,6 +9,7 @@ extends Node3D
 var target_position = Vector2()
 var timer = 0
 var last_direction = Vector3()
+var last_position = Vector3()
 
 func _ready():
 	set_process(false)
@@ -71,8 +72,12 @@ func _process(delta: float) -> void:
 			if core.network.socket.send_text(JSON.stringify(action)) != OK:
 				print("Sent error!")
 			last_direction = vec.normalized()
+			position = last_position
 			timer = 0
 		else:
 			if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 				translate(-last_direction * 100 * (delta * 0.9))
 	timer += delta
+	
+func set_next_position(next_pos: Vector3):
+	last_position = next_pos
