@@ -1,9 +1,6 @@
 extends Node3D
 
-@onready var asteroid_scene: Resource = load("res://scenes/asteroid.tscn")
-@onready var planet_scene: Resource = load("res://scenes/planet.tscn")
-@onready var moon_scene: Resource = load("res://scenes/moon.tscn")
-@onready var star_scene: Resource = load("res://scenes/star.tscn")
+@onready var body_scene: Resource = load("res://scenes/body.tscn")
 @onready var player_scene: Resource = load("res://scenes/player.tscn")
 
 @onready var core = get_tree().get_first_node_in_group("core")
@@ -48,16 +45,16 @@ func get_colored_galactic_node(type: String) -> Node:
 	var color: Color
 	var galactic_tree: Node
 	if type == "4":
-		galactic_tree = asteroid_scene.instantiate()
+		galactic_tree = body_scene.instantiate()
 		color = Color(1, 0, 0)
 	elif type == "2":
-		galactic_tree = planet_scene.instantiate()
+		galactic_tree = body_scene.instantiate()
 		color = Color(0, 0, 1)
 	elif type == "3":
-		galactic_tree = moon_scene.instantiate()
+		galactic_tree = body_scene.instantiate()
 		color = Color(0, 1, 1)
 	elif type == "1":
-		galactic_tree = star_scene.instantiate()
+		galactic_tree = body_scene.instantiate()
 		color = Color(1, 1, 1)
 	else:
 		assert(false)

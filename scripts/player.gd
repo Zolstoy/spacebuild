@@ -76,8 +76,8 @@ func _process(delta: float) -> void:
 			timer = 0
 		else:
 			if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-				translate(-last_direction * 100 * (delta * 0.9))
+				translate(-last_direction * 100 * (delta * 0.5))
 	timer += delta
-	
+
 func set_next_position(next_pos: Vector3):
 	last_position = next_pos
