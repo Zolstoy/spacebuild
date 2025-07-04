@@ -7,10 +7,11 @@
 script = ExtResource("1_g2els")
 
 [node name="spaceship" parent="." groups=["ship"] instance=ExtResource("1_3vyb7")]
-transform = Transform3D(0.573068, 0, 0, 0, 0.573068, 0, 0, 0, 0.573068, 0, 0, 0)
+transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, 0, 0, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-1, 0, 8.74228e-08, 5.36363e-08, 0.789673, 0.613527, -6.90355e-08, 0.613527, -0.789673, 9.61096e-08, 0, -5.13031)
+transform = Transform3D(-1, -7.10543e-15, 8.74228e-08, 5.36363e-08, 0.789674, 0.613527, -6.90355e-08, 0.613527, -0.789674, 9.61096e-08, 0.927414, -0.62658)
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-1, -2.13163e-14, 8.74228e-08, 2.57773e-08, 0.955541, 0.294858, -8.35361e-08, 0.294858, -0.955541, 3.98185e-07, 3.79953, -5.96592)
+transform = Transform3D(-1, -2.13163e-14, 8.74228e-08, 2.57773e-08, 0.955541, 0.294858, -8.35361e-08, 0.294858, -0.955541, 3.98185e-07, 0.234897, -0.398361)
+far = 1e+06

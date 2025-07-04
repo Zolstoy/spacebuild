@@ -1,7 +1,7 @@
 extends Node3D
 
 @onready var body_scene: Resource = load("res://scenes/body.tscn")
-@onready var player_scene: Resource = load("res://scenes/player.tscn")
+# @onready var player_scene: Resource = load("res://scenes/player.tscn")
 
 @onready var core = get_tree().get_first_node_in_group("core")
 @onready var info = get_tree().get_first_node_in_group("info")
@@ -43,21 +43,23 @@ func stop():
 
 func get_colored_galactic_node(type: String) -> Node:
 	var color: Color
-	var galactic_tree: Node
+	var galactic_tree: Node3D = body_scene.instantiate()
+	var model: CSGSphere3D = galactic_tree.get_child(0)
+
 	if type == "4":
-		galactic_tree = body_scene.instantiate()
-		color = Color(1, 0, 0)
+		galactic_tree.scale *= 1
+		color = Color.DARK_MAGENTA
 	elif type == "2":
-		galactic_tree = body_scene.instantiate()
-		color = Color(0, 0, 1)
+		galactic_tree.scale *= 100
+		color = Color.ALICE_BLUE
 	elif type == "3":
-		galactic_tree = body_scene.instantiate()
-		color = Color(0, 1, 1)
+		galactic_tree.scale *= 10
+		color = Color.LAWN_GREEN
 	elif type == "1":
-		galactic_tree = body_scene.instantiate()
-		color = Color(1, 1, 1)
+		galactic_tree.scale *= 1000
+		color = Color.GHOST_WHITE
 	else:
 		assert(false)
-	var model = galactic_tree.get_child(0)
+
 	(model.material as StandardMaterial3D).albedo_color = color
 	return galactic_tree
