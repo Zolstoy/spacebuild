@@ -15,9 +15,13 @@ var socket: WebSocketPeer = null
 var galactics = []
 var ping = 0
 @onready var last_ping_time = Time.get_ticks_msec()
-
+var to_send = []
 func _ready():
 	set_process(false)
+
+func send(msg: String):
+	if state == State.Network.WAITING_GAMEINFO:
+		to_send.append(msg)
 
 func _process(_delta):
 	var new_network_state = null
@@ -31,6 +35,11 @@ func _process(_delta):
 		new_network_state = State.Network.IDLE
 		core.spawner.stop()
 		set_process(false)
+
+	for msg in to_send:
+		if socket.get_ready_state() != WebSocketPeer.STATE_OPEN:
+			socket.send_text(msg)
+	to_send.clear()
 
 	if socket_state == WebSocketPeer.STATE_OPEN:
 		if state == State.Network.CONNECTING:

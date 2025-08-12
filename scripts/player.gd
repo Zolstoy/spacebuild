@@ -69,8 +69,9 @@ func _process(delta: float) -> void:
 
 
 		if timer >= (core.network.ping / 1000.):
-			if core.network.socket.send_text(JSON.stringify(action)) != OK:
-				print("Sent error!")
+			#if core.network.socket.send_text(JSON.stringify(action)) != OK:
+				#print("Sent error!")
+			core.network.send(JSON.stringify(action))
 			last_direction = vec.normalized()
 			position = last_position
 			timer = 0
