@@ -49,9 +49,9 @@ func _process(_delta: float) -> void:
 
 		look_at(target.global_position, vec.cross(-basis.x))
 
-		action["ShipState"]["direction"][0] = -vec.x
-		action["ShipState"]["direction"][1] = -vec.y
-		action["ShipState"]["direction"][2] = -vec.z
+		action["ShipState"]["direction"][0] = - vec.x
+		action["ShipState"]["direction"][1] = - vec.y
+		action["ShipState"]["direction"][2] = - vec.z
 
 		remove_child(target)
 
@@ -61,9 +61,9 @@ func _process(_delta: float) -> void:
 		ship.rotate(Vector3.RIGHT, clampf(target_position.y, -clamp_val / 2, clamp_val / 2))
 		ship.rotate(Vector3.DOWN, clampf(target_position.x, -clamp_val, clamp_val))
 		ship.rotate(Vector3.BACK, clampf(target_position.x * turn_factor,
-			-clamp_val * turn_factor, clamp_val * turn_factor))
+			- clamp_val * turn_factor, clamp_val * turn_factor))
 
-		#if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			#translate(vec.normalized() * 100 * _delta)
+		# if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		# 	translate(vec.normalized() * 100 * _delta)
 		if core.network.socket.send_text(JSON.stringify(action)) != OK:
 			print("Send error")
