@@ -11,10 +11,11 @@ script = ExtResource("1_mcqwg")
 [node name="Model" type="CSGSphere3D" parent="."]
 transform = Transform3D(1000, 0, 0, 0, 1000, 0, 0, 0, 1000, 0, 0, 0)
 layers = 512
+radius = 0.25
 rings = 14
 material = SubResource("StandardMaterial3D_mcqwg")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 light_energy = 1000.0
 light_cull_mask = 4294966783
-omni_range = 1e+06
+omni_range = 1000000.0
